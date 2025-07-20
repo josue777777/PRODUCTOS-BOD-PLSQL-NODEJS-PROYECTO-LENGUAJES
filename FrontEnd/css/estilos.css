@@ -1,0 +1,221 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Roboto:wght@400;700&display=swap");
+
+:root {
+  --primary-color: #0050a0;
+  --secondary-color: #ffffff;
+  --text-color: #000000;
+  --input-bg: #ffffff;
+  --border-color: #ccc;
+}
+
+/* ====== RESET BÁSICO ====== */
+html {
+  box-sizing: border-box;
+  font-size: 62.5%;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 1.6rem;
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  margin: 0;
+}
+
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #004aad;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.app-header .logo-block {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.app-header .logo-block i {
+  font-size: 2.2rem;
+  color: #ffcc00;
+}
+
+.app-header .user-block {
+  font-size: 1.4rem;
+  font-weight: 500;
+}
+
+/* ===== Sidebar ===== */
+.app-sidebar {
+  position: fixed;
+  top: 60px; /* debajo del header */
+  left: 0;
+  width: 220px;
+  height: calc(100vh - 60px);
+  background: #002f6c;
+  color: #fff;
+  padding-top: 2rem;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
+}
+
+.app-sidebar nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.app-sidebar nav ul li {
+  margin: 1rem 0;
+}
+
+.app-sidebar nav ul li a {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.6rem;
+  padding: 1rem 2rem;
+  transition: background 0.3s ease;
+}
+
+.app-sidebar nav ul li a:hover {
+  background: #0050a0;
+  border-left: 4px solid #ffcc00;
+}
+
+footer {
+  margin-left: 13%;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+/* ====== MÓDULO KARDEX ====== */
+.main-kardex {
+  margin-left: 220px;
+  margin-top: 60px;
+  padding: 2rem;
+  min-height: 100vh;
+  background: #f5f7fc;
+  box-sizing: border-box;
+  min-height: calc(100vh - 60px);
+}
+
+.kardex-container {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.formulario-kardex,
+.historial-kardex {
+  background: linear-gradient(to bottom right, #f0f4fa, #d8e2f1);
+  border: 1px solid #c3d0e5;
+  border-radius: 1rem;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  padding: 2rem 2.5rem;
+}
+
+.formulario-kardex:hover,
+.historial-kardex:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+}
+
+.formulario-kardex h2,
+.historial-kardex h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--primary-color);
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.formulario-kardex input,
+.formulario-kardex select {
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #b0c4de;
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1rem;
+}
+
+.formulario-kardex button {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0.6rem;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-registrar {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.btn-registrar:hover {
+  background-color: #218838;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+}
+
+.historial-kardex table {
+  table-layout: fixed;
+  width: 100%;
+  background-color: #fff;
+  border-collapse: collapse;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.historial-kardex th {
+  background-color: var(--primary-color);
+  color: #fff;
+  padding: 0.8rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.historial-kardex td {
+  padding: 0.8rem;
+  border-top: 1px solid #e0e0e0;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.historial-kardex tr:nth-child(even) {
+  background-color: #f5f9ff;
+}

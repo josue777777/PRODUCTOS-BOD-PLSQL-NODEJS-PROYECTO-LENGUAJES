@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Kardex</title>
+    <link rel="stylesheet" href="../css/estilos.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+  </head>
+
+  <body>
+    <header class="app-header">
+      <div class="logo-block">
+        <i class="fa-solid fa-boxes-stacked"></i>
+        <span class="logo-text">Inventario Pro</span>
+      </div>
+      <div class="user-block">
+        <span class="user-name">👤 Admin Sucursal Central</span>
+      </div>
+    </header>
+
+    <aside class="app-sidebar">
+      <nav>
+        <ul>
+          <li>
+            <a href="#"><i class="fa-solid fa-house"></i> Dashboard</a>
+          </li>
+          <li>
+            <a href="#"><i class="fa-solid fa-boxes-stacked"></i> Inventario</a>
+          </li>
+          <li>
+            <a href="#"><i class="fa-solid fa-store"></i> Sucursales</a>
+          </li>
+          <li>
+            <a href="#"><i class="fa-solid fa-right-from-bracket"></i> Salir</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="main-kardex">
+      <section class="kardex-container">
+        <!-- SELECCIONAR SUCURSAL Y ALMACÉN -->
+        <div class="formulario-kardex" style="grid-column: 1 / span 2">
+          <h2>Seleccionar Sucursal y Almacén</h2>
+          <label for="ddlSucursal">Sucursal:</label>
+          <select id="ddlSucursal">
+            <option value="">Seleccione sucursal...</option>
+          </select>
+
+          <label for="ddlAlmacenGlobal">Almacén:</label>
+          <select id="ddlAlmacenGlobal">
+            <option value="">Seleccione almacén...</option>
+          </select>
+        </div>
+
+        <!-- FORMULARIO AGREGAR -->
+        <div class="formulario-kardex">
+          <h2>Registrar Ingreso</h2>
+          <form id="formAgregar">
+            <input
+              type="number"
+              id="idProductoAgregar"
+              placeholder="ID Producto"
+              required
+            />
+            <input
+              type="number"
+              id="cantidadAgregar"
+              placeholder="Cantidad a agregar"
+              required
+            />
+            <button type="submit" class="btn-registrar">
+              ➕ Agregar Producto
+            </button>
+          </form>
+        </div>
+
+        <!-- FORMULARIO REBAJAR -->
+        <div class="formulario-kardex">
+          <h2>Registrar Salida</h2>
+          <form id="formRebajar">
+            <input
+              type="number"
+              id="idProductoRebajar"
+              placeholder="ID Producto"
+              required
+            />
+            <input
+              type="number"
+              id="cantidadRebajar"
+              placeholder="Cantidad a rebajar"
+              required
+            />
+            <button type="submit" class="btn-warning">
+              ➖ Rebajar Producto
+            </button>
+          </form>
+        </div>
+
+        <!-- LISTADO DE PRODUCTOS -->
+        <div class="historial-kardex" style="grid-column: 1 / span 2">
+          <h2>Productos Disponibles</h2>
+          <button id="btnCargarProductos">🔄 Cargar Productos</button>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Unidad</th>
+                <th>Estado</th>
+                <th>Cantidad</th>
+              </tr>
+            </thead>
+            <tbody id="tablaProductos">
+              <!-- Aquí se cargan los productos -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </body>
+  <script src="../js/kardex.js"></script>
+</html>

@@ -198,6 +198,7 @@ TO G5_ROL_DESA;
 
 GRANT G5_ROL_DESA TO G5Desa01;
 GRANT G5_ROL_DESA TO G5Desa02;
+GRANT G5_ROL_APP TO G5DESA01;
 
 CREATE USER G5UF01 IDENTIFIED BY G5_UF01
 TEMPORARY TABLESPACE TEMP;
@@ -348,6 +349,7 @@ ORDER BY 1;
 SELECT *
 FROM dba_roles
 WHERE role LIKE 'G5_ROL%';
+
 
 
 SELECT *
@@ -747,4 +749,35 @@ BEGIN
 END;
 /
 COMMIT;
+
+
+
+
+
+
+--verificar insersiones o movimientos del frontend
+
+  --verificar saldo por bodega 
+SELECT 
+  id_producto      AS codigo, 
+  id_almacen       AS almacen, 
+  cantidad_disponible AS disponible
+FROM inv_tablas.inventario_tb
+WHERE id_producto = 100
+  AND id_almacen = 2;
+  
+  
+  
+  --verificar saldo general del codigo 
+SELECT  
+  p.id_producto        AS codigo, 
+  p.nombre_producto    AS producto,
+  a.nombre_almacen     AS almacen,
+  i.cantidad_disponible AS disponible
+FROM inv_tablas.inventario_tb i
+JOIN inv_tablas.producto_tb p ON i.id_producto = p.id_producto
+JOIN alm_tablas.almacen_tb a ON i.id_almacen = a.id_almacen
+ORDER BY p.id_producto, a.id_almacen;
+
+
 

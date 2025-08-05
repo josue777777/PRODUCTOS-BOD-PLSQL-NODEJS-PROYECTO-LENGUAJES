@@ -1,33 +1,25 @@
 const express = require("express");
 const router = express.Router();
 
-// 🔹 Importa todas las funciones desde el controlador
 const {
-  agregarProductoAlmacen,
-  rebajarProductoAlmacen,
-  listarProductos,
-  listarKardexPorProducto,
-  listarSucursales,
-  listarAlmacenesPorSucursal,
-  listarAlmacenesConSucursal,
-  listarInventarioPorAlmacen, // 👈 IMPORTANTE agregar esto
+  agregarProducto,
+  rebajarProducto,
+  listarTodosLosProductos,
+  listarKardex,
+  listarTodasLasSucursales,
+  listarAlmacenes,
+  listarTodosLosAlmacenes,
+  listarInventario,
 } = require("../controllers/inventarioController");
 
-// ✅ Rutas
-router.get("/productos", listarProductos);
-
-router.post("/agregar", agregarProductoAlmacen);
-
-router.post("/rebajar", rebajarProductoAlmacen);
-
-router.get("/kardex/:idProducto", listarKardexPorProducto);
-
-router.get("/sucursales", listarSucursales);
-
-router.get("/almacenes/:idSucursal", listarAlmacenesPorSucursal);
-
-router.get("/almacenes", listarAlmacenesConSucursal);
-
-router.get("/inventario/:idAlmacen", listarInventarioPorAlmacen); // ✅ ya funciona
+// RUTAS
+router.post("/agregar", agregarProducto);
+router.post("/rebajar", rebajarProducto);
+router.get("/productos", listarTodosLosProductos);
+router.get("/kardex/:idProducto", listarKardex);
+router.get("/sucursales", listarTodasLasSucursales);
+router.get("/almacenes/:idSucursal", listarAlmacenes);
+router.get("/almacenes", listarTodosLosAlmacenes);
+router.get("/inventario/:idAlmacen", listarInventario);
 
 module.exports = router;

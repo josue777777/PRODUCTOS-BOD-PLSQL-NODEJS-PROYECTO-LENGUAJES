@@ -16,7 +16,7 @@ app.use("/api/inventario", inventarioRoutes);
 app.use(express.static(path.join(__dirname, "../FrontEnd")));
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../FrontEnd/html/kardex.html"));
+  res.sendFile(path.join(__dirname, "../FrontEnd/Views/kardex.html"));
 });
 
 app.listen(PORT, () => {

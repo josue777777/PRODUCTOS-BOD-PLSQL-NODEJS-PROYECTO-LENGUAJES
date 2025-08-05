@@ -168,18 +168,7 @@ CREATE TABLE detalle_solicitud_tb(
 
 
 
-
-
-
-
-
-
--------------------------------------------------------------------------------------------------------------------------------------------------DIVISION PROXIMO PASO DEL PROYECTO DESA PROYECTO Y USUARIO FINALES 
-
-
-
-
-
+-------------------------------------------------------------------------------------------------DIVISION PROXIMO PASO DEL PROYECTO DESA PROYECTO Y USUARIO FINALES 
 
 -- Se corre en sys o system
 
@@ -748,11 +737,7 @@ BEGIN
 
 END;
 /
-COMMIT;
-
-
-
-
+COMMIT
 
 
 --verificar insersiones o movimientos del frontend
@@ -767,7 +752,6 @@ WHERE id_producto = 100
   AND id_almacen = 2;
   
   
-  
   --verificar saldo general del codigo 
 SELECT  
   p.id_producto        AS codigo, 
@@ -779,5 +763,234 @@ JOIN inv_tablas.producto_tb p ON i.id_producto = p.id_producto
 JOIN alm_tablas.almacen_tb a ON i.id_almacen = a.id_almacen
 ORDER BY p.id_producto, a.id_almacen;
 
+--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Se corre en sys o system
+GRANT SELECT, UPDATE ON inv_tablas.inventario_tb TO oper_tablas;
+GRANT SELECT ON inv_tablas.producto_tb TO oper_tablas;
+GRANT SELECT ON alm_tablas.almacen_tb TO oper_tablas;
+GRANT SELECT ON alm_tablas.departamentos_tb TO oper_tablas;
+GRANT CREATE PROCEDURE TO OPER_TABLAS;
+
+-- Se corre en oper_tablas
+-- tablas rechazos
+
+CREATE TABLE oper_tablas.rechazos_tb (
+    id_solicitud       NUMBER,
+    id_producto        NUMBER,
+    cantidad_solicitada NUMBER,
+    cantidad_rechazada  NUMBER,
+    CONSTRAINT pk_rechazos_tb PRIMARY KEY (id_solicitud, id_producto)
+);
+
+-- Transaccion Principal --
+
+CREATE OR REPLACE PROCEDURE oper_tablas.G5_SOLICITAR_PRODUCTO
+(
+    p_id_usuario       IN  NUMBER,
+    p_id_departamento  IN  NUMBER,
+    p_id_producto      IN  NUMBER,
+    p_cantidad         IN  NUMBER,
+    p_mensaje          OUT VARCHAR2
+) AUTHID DEFINER
+AS
+    v_existe_usuario     NUMBER := 0;
+    v_existe_depto       NUMBER := 0;
+    v_existe_producto    NUMBER := 0;
+
+    v_id_sucursal        NUMBER;
+    v_precio_unitario    NUMBER := 0;
+
+    v_stock_total        NUMBER := 0;
+    v_a_entregar_total   NUMBER := 0;
+    v_rechazado          NUMBER := 0;
+    v_pendiente          NUMBER := 0;
+    v_monto_total        NUMBER := 0;
+
+    v_id_factura         NUMBER;
+    v_id_solicitud       NUMBER;
+    v_nuevo_detalle_id   NUMBER;
+BEGIN
+    -- 1) Validaciones
+    SELECT COUNT(*) INTO v_existe_usuario
+      FROM oper_tablas.usuario_tb
+     WHERE id_usuario = p_id_usuario;
+    IF v_existe_usuario = 0 THEN p_mensaje := 'Usuario inválido'; RETURN; END IF;
+
+    SELECT COUNT(*) INTO v_existe_depto
+      FROM alm_tablas.departamentos_tb
+     WHERE id_departamento = p_id_departamento;
+    IF v_existe_depto = 0 THEN p_mensaje := 'Departamento inválido'; RETURN; END IF;
+
+    SELECT COUNT(*) INTO v_existe_producto
+      FROM inv_tablas.producto_tb
+     WHERE id_producto = p_id_producto;
+    IF v_existe_producto = 0 THEN p_mensaje := 'Producto inválido'; RETURN; END IF;
+
+    IF p_cantidad IS NULL OR p_cantidad <= 0 THEN
+        p_mensaje := 'Cantidad solicitada inválida'; RETURN;
+    END IF;
+
+    -- 2) Datos base
+    SELECT id_sucursal
+      INTO v_id_sucursal
+      FROM alm_tablas.departamentos_tb
+     WHERE id_departamento = p_id_departamento;
+
+    SELECT precio_unitario
+      INTO v_precio_unitario
+      FROM inv_tablas.producto_tb
+     WHERE id_producto = p_id_producto;
+
+    -- 3) Stock total
+    SELECT NVL(SUM(i.cantidad_disponible), 0)
+      INTO v_stock_total
+      FROM inv_tablas.inventario_tb i
+      JOIN alm_tablas.almacen_tb a ON a.id_almacen = i.id_almacen
+     WHERE a.id_sucursal = v_id_sucursal
+       AND i.id_producto = p_id_producto;
+
+    IF v_stock_total <= 0 THEN
+        v_a_entregar_total := 0;
+        v_rechazado        := p_cantidad;
+    ELSIF v_stock_total < p_cantidad THEN
+        v_a_entregar_total := v_stock_total;
+        v_rechazado        := p_cantidad - v_stock_total;
+    ELSE
+        v_a_entregar_total := p_cantidad;
+        v_rechazado        := 0;
+    END IF;
+
+    -- 4) Factura
+    SELECT NVL(MAX(id_factura),0) + 1 INTO v_id_factura FROM oper_tablas.factura_tb;
+    INSERT INTO oper_tablas.factura_tb (id_factura, fecha, monto_total)
+    VALUES (v_id_factura, SYSDATE, 0);
+
+    -- 5) Solicitud
+    SELECT NVL(MAX(id_solicitud),0) + 1 INTO v_id_solicitud FROM oper_tablas.solicitud_tb;
+    INSERT INTO oper_tablas.solicitud_tb (id_solicitud, fecha, id_departamento, id_factura, id_usuario)
+    VALUES (v_id_solicitud, SYSDATE, p_id_departamento, v_id_factura, p_id_usuario);
+
+    -- 6) Rechazo (si aplica)
+    IF v_rechazado > 0 THEN
+        INSERT INTO oper_tablas.rechazos_tb (id_solicitud, id_producto, cantidad_solicitada, cantidad_rechazada)
+        VALUES (v_id_solicitud, p_id_producto, p_cantidad, v_rechazado);
+    END IF;
+
+    -- 7) Reparto de entrega
+    v_pendiente := v_a_entregar_total;
+
+    FOR reg IN (
+        SELECT i.id_inventario, i.cantidad_disponible, i.stock_minimo, i.id_almacen
+          FROM inv_tablas.inventario_tb i
+          JOIN alm_tablas.almacen_tb a ON a.id_almacen = i.id_almacen
+         WHERE a.id_sucursal = v_id_sucursal
+           AND i.id_producto = p_id_producto
+         ORDER BY i.id_inventario
+    ) LOOP
+        EXIT WHEN v_pendiente <= 0;
+
+        DECLARE
+            v_entregar NUMBER;
+            v_restante NUMBER;
+        BEGIN
+            v_entregar := LEAST(reg.cantidad_disponible, v_pendiente);
+
+            SELECT NVL(MAX(id_detalle_solicitud),0) + 1
+              INTO v_nuevo_detalle_id
+              FROM oper_tablas.detalle_solicitud_tb;
+
+            INSERT INTO oper_tablas.detalle_solicitud_tb (
+                id_detalle_solicitud, id_solicitud, id_inventario,
+                cantidad_solicitada, cantidad_entregada
+            ) VALUES (
+                v_nuevo_detalle_id, v_id_solicitud, reg.id_inventario,
+                v_pendiente, v_entregar
+            );
+
+            UPDATE inv_tablas.inventario_tb
+               SET cantidad_disponible = cantidad_disponible - v_entregar
+             WHERE id_inventario = reg.id_inventario;
+
+            v_restante    := reg.cantidad_disponible - v_entregar;
+            v_pendiente   := v_pendiente - v_entregar;
+            v_monto_total := v_monto_total + (v_entregar * v_precio_unitario);
+
+            IF v_restante < reg.stock_minimo THEN
+                DBMS_OUTPUT.PUT_LINE('Alerta: stock bajo en almacén ' || reg.id_almacen ||
+                                     ' para producto ' || p_id_producto);
+            END IF;
+        END;
+    END LOOP;
+
+    -- 8) Actualizar factura
+    UPDATE oper_tablas.factura_tb
+       SET monto_total = v_monto_total
+     WHERE id_factura = v_id_factura;
+
+    COMMIT;
+
+    -- 9) Mensaje
+    IF v_a_entregar_total = 0 THEN
+        p_mensaje := 'Solicitud ' || v_id_solicitud ||
+                     ' rechazada: sin stock disponible. Rechazado: ' || v_rechazado;
+    ELSIF v_rechazado > 0 THEN
+        p_mensaje := 'Solicitud ' || v_id_solicitud ||
+                     ' atendida parcialmente. Entregado: ' || v_a_entregar_total ||
+                     ', Rechazado: ' || v_rechazado || '. Monto: ' || v_monto_total;
+    ELSE
+        p_mensaje := 'Solicitud ' || v_id_solicitud ||
+                     ' atendida completamente. Entregado: ' || v_a_entregar_total ||
+                     '. Monto: ' || v_monto_total;
+    END IF;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        p_mensaje := 'Error: ' || SQLERRM;
+END;
+/
 
 
+-- Caso 1: stock suficiente
+SET SERVEROUTPUT ON;
+DECLARE
+    v_msg VARCHAR2(500);
+BEGIN
+    oper_tablas.G5_SOLICITAR_PRODUCTO(
+        p_id_usuario      => 2,
+        p_id_departamento => 1,
+        p_id_producto     => 100,
+        p_cantidad        => 5, 
+        p_mensaje         => v_msg
+    );
+    DBMS_OUTPUT.PUT_LINE(v_msg);
+END;
+/
+
+SELECT * FROM oper_tablas.rechazos_tb
+WHERE id_solicitud = (SELECT MAX(id_solicitud) FROM oper_tablas.solicitud_tb);
+
+-- Casp 2: stock insuficiente 
+SET SERVEROUTPUT ON;
+DECLARE
+    v_msg VARCHAR2(500);
+BEGIN
+    oper_tablas.G5_SOLICITAR_PRODUCTO(
+        p_id_usuario      => 2,
+        p_id_departamento => 2,
+        p_id_producto     => 107,
+        p_cantidad        => 55, 
+        p_mensaje         => v_msg
+    );
+    DBMS_OUTPUT.PUT_LINE(v_msg);
+END;
+/
+
+-- Consultas
+
+SELECT * FROM oper_tablas.rechazos_tb
+WHERE id_solicitud = (SELECT MAX(id_solicitud) FROM oper_tablas.solicitud_tb);
+SELECT * FROM oper_tablas.solicitud_tb ORDER BY id_solicitud DESC;
+SELECT * FROM oper_tablas.detalle_solicitud_tb WHERE id_solicitud = (SELECT MAX(id_solicitud) FROM oper_tablas.solicitud_tb);
+SELECT * FROM oper_tablas.factura_tb WHERE id_factura = (SELECT id_factura FROM oper_tablas.solicitud_tb WHERE id_solicitud = (SELECT MAX(id_solicitud) FROM oper_tablas.solicitud_tb));
+SELECT * FROM inv_tablas.inventario_tb WHERE id_producto = 100;

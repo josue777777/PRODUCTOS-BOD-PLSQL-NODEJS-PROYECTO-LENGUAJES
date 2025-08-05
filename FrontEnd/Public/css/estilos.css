@@ -193,27 +193,37 @@ footer {
 }
 
 .historial-kardex table {
-  table-layout: fixed;
   width: 100%;
-  background-color: #fff;
   border-collapse: collapse;
   border-radius: 0.75rem;
   overflow: hidden;
+  background-color: #fff;
+  table-layout: auto; /* o fixed si querés columnas de igual ancho */
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .historial-kardex th {
   background-color: var(--primary-color);
   color: #fff;
-  padding: 0.8rem;
-  font-size: 0.9rem;
+  padding: 1rem;
+  font-size: 1.4rem;
   text-transform: uppercase;
+  border-bottom: 2px solid #004488;
 }
 
 .historial-kardex td {
-  padding: 0.8rem;
-  border-top: 1px solid #e0e0e0;
-  font-size: 0.95rem;
+  padding: 1rem;
+  font-size: 1.3rem;
+  border-bottom: 1px solid #e0e0e0;
   color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.historial-kardex tr:nth-child(even) {
+  background-color: #f4f7fc;
 }
 
 .historial-kardex tr:nth-child(even) {

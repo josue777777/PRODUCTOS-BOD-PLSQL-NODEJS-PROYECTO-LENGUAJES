@@ -119,14 +119,14 @@ document
       data.forEach((p) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-        <td>${p.id_inventario}</td>
+        <td>${p.id_producto}</td>
         <td>${p.nombre_producto}</td>
         <td>${p.descripcion}</td>
         <td>${p.precio_unitario}</td>
         <td>${p.nombre_unidad_medida}</td>
         <td>${p.nombre_estado}</td>
         <td>${p.cantidad_disponible}</td>
-      `;
+        </tr>`;
         tbody.appendChild(tr);
       });
     } catch (err) {

@@ -71,9 +71,6 @@ const listarProductos = async (req, res) => {
     await resultSet.close();
     await conn.close();
 
-    // 🔹 Ajusta los índices a lo que devuelve el procedimiento actualizado:
-    // [0]=id_producto, [1]=nombre_producto, [2]=descripcion, [3]=precio_unitario
-    // [4]=nombre_unidad_medida, [5]=nombre_estado
     const data = rows.map((r) => ({
       id_producto: r[0],
       nombre_producto: r[1],

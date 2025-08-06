@@ -62,13 +62,13 @@ CREATE TABLE estado_tb(
     nombre_estado VARCHAR2(30)
 );
 
--- Sucursales fÌsicas
+-- Sucursales f√≠sicas
 CREATE TABLE sucursal_tb(
     id_sucursal NUMBER CONSTRAINT pk_sucursal_tb PRIMARY KEY,
     nombre_sucursal VARCHAR2(100)
 );
 
--- Departamentos (·reas que solicitan productos)
+-- Departamentos (√°reas que solicitan productos)
 CREATE TABLE departamentos_tb(
     id_departamento NUMBER CONSTRAINT pk_departamentos_tb PRIMARY KEY,
     nombre_departamento VARCHAR2(100),
@@ -83,7 +83,7 @@ CREATE TABLE almacen_tb(
     id_estado NUMBER(2)CONSTRAINT fk2_almacen_tb REFERENCES estado_tb
 );
 
--- Grants a otros mÛdulos
+-- Grants a otros m√≥dulos
 GRANT REFERENCES ON departamentos_tb TO oper_tablas;
 GRANT REFERENCES ON almacen_tb TO inv_tablas;
 GRANT REFERENCES ON estado_tb TO inv_tablas;
@@ -95,7 +95,7 @@ CREATE TABLE unidad_medida_tb(
     nombre VARCHAR2(30)
 );
 
--- Productos (cat·logo)
+-- Productos (cat√°logo)
 CREATE TABLE producto_tb(
     id_producto NUMBER CONSTRAINT pk_producto_tb  PRIMARY KEY,
     nombre_producto VARCHAR2(100),
@@ -112,7 +112,7 @@ CREATE TABLE lote_tb(
     fecha_vencimiento DATE
 );
 
--- Inventario disponible por almacÈn
+-- Inventario disponible por almac√©n
 CREATE TABLE inventario_tb(
     id_inventario NUMBER CONSTRAINT pk_inventario_tb PRIMARY KEY,
     id_producto NUMBER CONSTRAINT fk1_inventario_tb REFERENCES producto_tb,
@@ -154,7 +154,7 @@ CREATE TABLE solicitud_tb(
     id_usuario NUMBER CONSTRAINT fk3_solicitud_tb REFERENCES usuario_tb
 );
 
--- Detalle por Ìtem solicitado
+-- Detalle por √≠tem solicitado
 CREATE TABLE detalle_solicitud_tb(
     id_detalle_solicitud NUMBER CONSTRAINT pk_detalle_solicitud_tb PRIMARY KEY,
     id_solicitud NUMBER CONSTRAINT fk1_detalle_solicitud_tb REFERENCES solicitud_tb,
@@ -372,23 +372,23 @@ VALUES (1, 'Depto Compras', 1);
 INSERT INTO departamentos_tb (id_departamento, nombre_departamento, id_sucursal)
 VALUES (2, 'Depto Ventas', 1);
 INSERT INTO departamentos_tb (id_departamento, nombre_departamento, id_sucursal)
-VALUES (3, 'Depto LogÌstica', 2);
+VALUES (3, 'Depto Log√≠stica', 2);
 INSERT INTO departamentos_tb (id_departamento, nombre_departamento, id_sucursal)
-VALUES (4, 'Depto ProducciÛn', 3);
+VALUES (4, 'Depto Producci√≥n', 3);
 INSERT INTO departamentos_tb (id_departamento, nombre_departamento, id_sucursal)
 VALUES (5, 'Depto RRHH', 1);
 COMMIT;
 
 INSERT INTO almacen_tb (id_almacen, nombre_almacen, id_sucursal, id_estado)
-VALUES (1, 'AlmacÈn Central A', 1, 1);
+VALUES (1, 'Almac√©n Central A', 1, 1);
 INSERT INTO almacen_tb (id_almacen, nombre_almacen, id_sucursal, id_estado)
-VALUES (2, 'AlmacÈn Central B', 1, 1);
+VALUES (2, 'Almac√©n Central B', 1, 1);
 INSERT INTO almacen_tb (id_almacen, nombre_almacen, id_sucursal, id_estado)
-VALUES (3, 'AlmacÈn Norte', 2, 1);
+VALUES (3, 'Almac√©n Norte', 2, 1);
 INSERT INTO almacen_tb (id_almacen, nombre_almacen, id_sucursal, id_estado)
-VALUES (4, 'AlmacÈn Sur', 3, 2); -- inactivo
+VALUES (4, 'Almac√©n Sur', 3, 2); -- inactivo
 INSERT INTO almacen_tb (id_almacen, nombre_almacen, id_sucursal, id_estado)
-VALUES (5, 'AlmacÈn Este', 4, 1);
+VALUES (5, 'Almac√©n Este', 4, 1);
 COMMIT;
 
 
@@ -448,7 +448,7 @@ COMMIT;
    ============================================================================================
 
    ? Los GRANT sobre tablas y secuencias se corren como SYS o SYSTEM.
-   ? La creaciÛn de la secuencia se corre como inv_tablas.
+   ? La creaci√≥n de la secuencia se corre como inv_tablas.
    ? Los procedimientos se crean en G5Desa01 (usuario desarrollador).
    ? Al final se dan permisos de EXECUTE a G5UF01 (usuario final).
 
@@ -474,7 +474,7 @@ GRANT CREATE SEQUENCE TO inv_tablas;
 
 
 /* ============================================================================================
-   2. CREAR SECUENCIA DESDE LA CONEXI”N inv_tablas
+   2. CREAR SECUENCIA DESDE LA CONEXI√ìN inv_tablas
 ============================================================================================ */
 -- Conectado como inv_tablas:
 CREATE SEQUENCE inv_tablas.SEQ_INVENTARIO
@@ -486,11 +486,11 @@ GRANT SELECT ON inv_tablas.SEQ_INVENTARIO TO G5Desa01;
 
 
 /* ============================================================================================
-   3. CREAR PROCEDIMIENTOS DESDE LA CONEXI”N G5Desa01
+   3. CREAR PROCEDIMIENTOS DESDE LA CONEXI√ìN G5Desa01
 ============================================================================================ */
 
 ----------------------------------------------------------------------------------------------
--- PROCEDIMIENTO PARA AGREGAR PRODUCTO A UN ALMAC…N
+-- PROCEDIMIENTO PARA AGREGAR PRODUCTO A UN ALMAC√âN
 ----------------------------------------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE G5_AGREGAR_PRODUCTO_ALMACEN (
     p_id_producto IN NUMBER,
@@ -536,7 +536,7 @@ END;
 
 
 ----------------------------------------------------------------------------------------------
--- PROCEDIMIENTO PARA REBAJAR PRODUCTO DE UN ALMAC…N
+-- PROCEDIMIENTO PARA REBAJAR PRODUCTO DE UN ALMAC√âN
 ----------------------------------------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE G5_REBAJAR_PRODUCTO_ALMACEN (
     p_id_producto IN NUMBER,
@@ -670,7 +670,7 @@ END;
 
 
 ----------------------------------------------------------------------------------------------
--- LISTAR INVENTARIO FILTRADO POR ALMAC…N
+-- LISTAR INVENTARIO FILTRADO POR ALMAC√âN
 ----------------------------------------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE G5_LISTAR_INVENTARIO_ALMACEN (
   p_id_almacen IN NUMBER,
@@ -703,7 +703,7 @@ END;
 
 
 /* ============================================================================================
-   4. PERMISOS DE EJECUCI”N AL USUARIO FINAL DESDE desa
+   4. PERMISOS DE EJECUCI√ìN AL USUARIO FINAL DESDE desa
 ============================================================================================ */
 
 
@@ -723,7 +723,7 @@ GRANT SELECT ON inv_tablas.producto_tb TO G5UF01;
 
 
 /* ============================================================================================
-   5. EJEMPLO DE EJECUCI”N (usuario final G5UF01)
+   5. EJEMPLO DE EJECUCI√ìN (usuario final G5UF01)
 ============================================================================================ */
 DECLARE
   v_resultado VARCHAR2(50);
@@ -733,7 +733,7 @@ BEGIN
   DBMS_OUTPUT.PUT_LINE('Resultado: '||v_resultado);
 
   G5Desa01.G5_LISTAR_SUCURSALES(v_cursor);
-  -- AquÌ puedes FETCH desde el cursor o usarlo en tu backend
+  -- Aqu√≠ puedes FETCH desde el cursor o usarlo en tu backend
 
 END;
 /
@@ -814,20 +814,20 @@ BEGIN
     SELECT COUNT(*) INTO v_existe_usuario
       FROM oper_tablas.usuario_tb
      WHERE id_usuario = p_id_usuario;
-    IF v_existe_usuario = 0 THEN p_mensaje := 'Usuario inv·lido'; RETURN; END IF;
+    IF v_existe_usuario = 0 THEN p_mensaje := 'Usuario inv√°lido'; RETURN; END IF;
 
     SELECT COUNT(*) INTO v_existe_depto
       FROM alm_tablas.departamentos_tb
      WHERE id_departamento = p_id_departamento;
-    IF v_existe_depto = 0 THEN p_mensaje := 'Departamento inv·lido'; RETURN; END IF;
+    IF v_existe_depto = 0 THEN p_mensaje := 'Departamento inv√°lido'; RETURN; END IF;
 
     SELECT COUNT(*) INTO v_existe_producto
       FROM inv_tablas.producto_tb
      WHERE id_producto = p_id_producto;
-    IF v_existe_producto = 0 THEN p_mensaje := 'Producto inv·lido'; RETURN; END IF;
+    IF v_existe_producto = 0 THEN p_mensaje := 'Producto inv√°lido'; RETURN; END IF;
 
     IF p_cantidad IS NULL OR p_cantidad <= 0 THEN
-        p_mensaje := 'Cantidad solicitada inv·lida'; RETURN;
+        p_mensaje := 'Cantidad solicitada inv√°lida'; RETURN;
     END IF;
 
     -- 2) Datos base
@@ -916,7 +916,7 @@ BEGIN
             v_monto_total := v_monto_total + (v_entregar * v_precio_unitario);
 
             IF v_restante < reg.stock_minimo THEN
-                DBMS_OUTPUT.PUT_LINE('Alerta: stock bajo en almacÈn ' || reg.id_almacen ||
+                DBMS_OUTPUT.PUT_LINE('Alerta: stock bajo en almac√©n ' || reg.id_almacen ||
                                      ' para producto ' || p_id_producto);
             END IF;
         END;
@@ -994,3 +994,226 @@ SELECT * FROM oper_tablas.solicitud_tb ORDER BY id_solicitud DESC;
 SELECT * FROM oper_tablas.detalle_solicitud_tb WHERE id_solicitud = (SELECT MAX(id_solicitud) FROM oper_tablas.solicitud_tb);
 SELECT * FROM oper_tablas.factura_tb WHERE id_factura = (SELECT id_factura FROM oper_tablas.solicitud_tb WHERE id_solicitud = (SELECT MAX(id_solicitud) FROM oper_tablas.solicitud_tb));
 SELECT * FROM inv_tablas.inventario_tb WHERE id_producto = 100;
+
+------------alertas------
+-- Tabla de alertas
+
+CREATE TABLE oper_tablas.alerta_inventario_tb (
+  id_alerta         NUMBER CONSTRAINT pk_alerta_inventario_tb PRIMARY KEY,
+  id_inventario     NUMBER,
+  id_producto       NUMBER,
+  id_almacen        NUMBER,
+  cantidad_disponible NUMBER,
+  stock_minimo      NUMBER,
+  fecha_alerta      DATE DEFAULT SYSDATE,
+  tipo_alerta       VARCHAR2(100), -- 'BAJO_STOCK', 'INCONSISTENCIA', etc.
+  mensaje           VARCHAR2(4000),
+  procesado         NUMBER DEFAULT 0  -- 0 = no, 1 = s√≠
+);
+
+ -- Crea secuencia para las alertas:
+
+CREATE SEQUENCE oper_tablas.SEQ_ALERTA_INVENTARIO START WITH 1 INCREMENT BY 1 NOCACHE;
+
+-- Trigger para detectar bajo stock
+
+CREATE OR REPLACE TRIGGER inv_tablas.trg_alerta_inventario
+AFTER INSERT OR UPDATE ON inv_tablas.inventario_tb
+FOR EACH ROW
+DECLARE
+  v_mensaje VARCHAR2(4000);
+  v_tipo    VARCHAR2(50);
+BEGIN
+  -- Bajo stock
+  IF :NEW.cantidad_disponible IS NOT NULL AND :NEW.stock_minimo IS NOT NULL 
+     AND :NEW.cantidad_disponible < :NEW.stock_minimo THEN
+    v_tipo := 'BAJO_STOCK';
+    v_mensaje := 'Stock por debajo del m√≠nimo. Disponible=' || :NEW.cantidad_disponible ||
+                 ', M√≠nimo=' || :NEW.stock_minimo;
+    INSERT INTO oper_tablas.alerta_inventario_tb (
+      id_alerta, id_inventario, id_producto, id_almacen,
+      cantidad_disponible, stock_minimo, tipo_alerta, mensaje
+    ) VALUES (
+      oper_tablas.SEQ_ALERTA_INVENTARIO.NEXTVAL,
+      :NEW.id_inventario,
+      :NEW.id_producto,
+      :NEW.id_almacen,
+      :NEW.cantidad_disponible,
+      :NEW.stock_minimo,
+      v_tipo,
+      v_mensaje
+    );
+  END IF;
+
+  -- Inconsistencia: cantidad_disponible negativa
+  IF :NEW.cantidad_disponible < 0 THEN
+    v_tipo := 'INCONSISTENCIA';
+    v_mensaje := 'Cantidad disponible negativa: ' || :NEW.cantidad_disponible;
+    INSERT INTO oper_tablas.alerta_inventario_tb (
+      id_alerta, id_inventario, id_producto, id_almacen,
+      cantidad_disponible, stock_minimo, tipo_alerta, mensaje
+    ) VALUES (
+      oper_tablas.SEQ_ALERTA_INVENTARIO.NEXTVAL,
+      :NEW.id_inventario,
+      :NEW.id_producto,
+      :NEW.id_almacen,
+      :NEW.cantidad_disponible,
+      :NEW.stock_minimo,
+      v_tipo,
+      v_mensaje
+    );
+  END IF;
+END;
+/
+
+-- Hist√≥rico de movimientos - Tabla de log de movimientos
+
+CREATE TABLE inv_tablas.kardex_movimientos_tb (
+  id_movimiento         NUMBER CONSTRAINT pk_kardex_movimientos PRIMARY KEY,
+  id_inventario         NUMBER,
+  id_producto           NUMBER,
+  id_almacen            NUMBER,
+  cantidad_anterior     NUMBER,
+  cantidad_nueva        NUMBER,
+  diferencia            NUMBER,
+  tipo_movimiento       VARCHAR2(50), -- 'AGREGADO', 'REBAJADO', 'SOLICITUD', etc.
+  usuario_ejecutor      VARCHAR2(100),
+  fecha_movimiento      DATE DEFAULT SYSDATE,
+  referencia            VARCHAR2(200) -- opcional: e.g., 'Solicitud 123'
+);
+CREATE SEQUENCE inv_tablas.SEQ_KARDEX_MOV START WITH 1 INCREMENT BY 1 NOCACHE;
+
+-- Trigger para registrar cambios en inventario 
+
+CREATE OR REPLACE TRIGGER inv_tablas.trg_kardex_inventario
+BEFORE UPDATE ON inv_tablas.inventario_tb
+FOR EACH ROW
+DECLARE
+  v_tipo VARCHAR2(50);
+BEGIN
+  IF :NEW.cantidad_disponible > :OLD.cantidad_disponible THEN
+    v_tipo := 'AGREGADO';
+  ELSIF :NEW.cantidad_disponible < :OLD.cantidad_disponible THEN
+    v_tipo := 'REBAJADO';
+  ELSE
+    v_tipo := 'SIN_CAMBIO';
+  END IF;
+
+  INSERT INTO inv_tablas.kardex_movimientos_tb (
+    id_movimiento,
+    id_inventario,
+    id_producto,
+    id_almacen,
+    cantidad_anterior,
+    cantidad_nueva,
+    diferencia,
+    tipo_movimiento,
+    usuario_ejecutor,
+    referencia
+  ) VALUES (
+    inv_tablas.SEQ_KARDEX_MOV.NEXTVAL,
+    :OLD.id_inventario,
+    :OLD.id_producto,
+    :OLD.id_almacen,
+    :OLD.cantidad_disponible,
+    :NEW.cantidad_disponible,
+    :NEW.cantidad_disponible - :OLD.cantidad_disponible,
+    v_tipo,
+    SYS_CONTEXT('USERENV','SESSION_USER'),
+    NULL  -- puedes llenar con detalle si lo pasas desde la aplicaci√≥n
+  );
+END;
+/
+
+-- reportes--
+--  Productos m√°s solicitados
+
+CREATE OR REPLACE VIEW reporte_productos_mas_solicitados_vw AS
+SELECT 
+  p.id_producto,
+  p.nombre_producto,
+  SUM(d.cantidad_solicitada) AS total_solicitado,
+  COUNT(DISTINCT s.id_solicitud) AS veces_solicitado
+FROM oper_tablas.detalle_solicitud_tb d
+JOIN oper_tablas.solicitud_tb s ON d.id_solicitud = s.id_solicitud
+JOIN inv_tablas.producto_tb p ON d.id_inventario = (
+    SELECT i.id_inventario FROM inv_tablas.inventario_tb i 
+    WHERE i.id_producto = p.id_producto AND i.id_inventario = d.id_inventario
+)
+GROUP BY p.id_producto, p.nombre_producto
+ORDER BY total_solicitado DESC;
+
+-- Consumo por departamento
+
+CREATE OR REPLACE VIEW reporte_consumo_departamento_vw AS
+SELECT 
+  dep.id_departamento,
+  dep.nombre_departamento,
+  SUM(ds.cantidad_entregada) AS total_entregado,
+  COUNT(DISTINCT s.id_solicitud) AS solicitudes,
+  SUM(ds.cantidad_solicitada) AS total_solicitado
+FROM oper_tablas.detalle_solicitud_tb ds
+JOIN oper_tablas.solicitud_tb s ON ds.id_solicitud = s.id_solicitud
+JOIN alm_tablas.departamentos_tb dep ON s.id_departamento = dep.id_departamento
+GROUP BY dep.id_departamento, dep.nombre_departamento
+ORDER BY total_entregado DESC;
+
+-- Hist√≥rico completo por producto 
+
+CREATE OR REPLACE VIEW reporte_kardex_producto_vw AS
+SELECT 
+  km.id_movimiento,
+  km.id_producto,
+  km.id_almacen,
+  km.cantidad_anterior,
+  km.cantidad_nueva,
+  km.diferencia,
+  km.tipo_movimiento,
+  km.usuario_ejecutor,
+  km.fecha_movimiento,
+  km.referencia
+FROM inv_tablas.kardex_movimientos_tb km
+ORDER BY km.fecha_movimiento DESC;
+
+-- Job programado para generaci√≥n autom√°tica
+
+BEGIN
+  DBMS_SCHEDULER.CREATE_JOB (
+    job_name        => 'JOB_REPORTE_INVENTARIO_DIARIO',
+    job_type        => 'PLSQL_BLOCK',
+    job_action      => q'[
+      BEGIN
+        -- Aqu√≠ podr√≠as, por ejemplo, volcar vistas en tablas de snapshot o hacer inserciones
+        INSERT INTO oper_tablas.snapshot_productos_mas_solicitados (
+          fecha_generacion, id_producto, nombre_producto, total_solicitado, veces_solicitado
+        )
+        SELECT SYSDATE, id_producto, nombre_producto, total_solicitado, veces_solicitado
+        FROM reporte_productos_mas_solicitados_vw WHERE ROWNUM <= 50;
+
+        INSERT INTO oper_tablas.snapshot_consumo_departamento (
+          fecha_generacion, id_departamento, nombre_departamento, total_entregado, solicitudes, total_solicitado
+        )
+        SELECT SYSDATE, id_departamento, nombre_departamento, total_entregado, solicitudes, total_solicitado
+        FROM reporte_consumo_departamento_vw;
+      END;
+    ]',
+    start_date      => SYSTIMESTAMP,
+    repeat_interval => 'FREQ=DAILY;BYHOUR=6;BYMINUTE=0;BYSECOND=0',
+    enabled         => TRUE,
+    comments        => 'Snapshot diario de reportes de inventario y consumo'
+  );
+END;
+/
+
+-- Consultas de verificaci√≥n r√°pidas
+-- Alertas pendientes:
+SELECT * FROM oper_tablas.alerta_inventario_tb WHERE procesado = 0 ORDER BY fecha_alerta DESC;
+
+-- Top productos solicitados:
+SELECT * FROM reporte_productos_mas_solicitados_vw WHERE ROWNUM <= 10;
+
+-- Consumo por departamento:
+SELECT * FROM reporte_consumo_departamento_vw;
+
+-- K√°rdex de un producto:
+SELECT * FROM reporte_kardex_producto_vw WHERE id_producto = 100;

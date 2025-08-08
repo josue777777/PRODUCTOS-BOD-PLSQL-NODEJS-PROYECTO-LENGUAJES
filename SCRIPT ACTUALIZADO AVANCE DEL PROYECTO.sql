@@ -447,10 +447,8 @@ COMMIT;
    FRONT END - PROCEDIMIENTOS Y PERMISOS
    ============================================================================================
 
-   ? Los GRANT sobre tablas y secuencias se corren como SYS o SYSTEM.
-   ? La creación de la secuencia se corre como inv_tablas.
-   ? Los procedimientos se crean en G5Desa01 (usuario desarrollador).
-   ? Al final se dan permisos de EXECUTE a G5UF01 (usuario final).
+   Los procedimientos se crean en G5Desa01 (usuario desarrollador).
+   Al final se dan permisos de EXECUTE a G5UF01 (usuario final).
 
 ============================================================================================ */
 
@@ -485,12 +483,23 @@ NOCACHE;
 GRANT SELECT ON inv_tablas.SEQ_INVENTARIO TO G5Desa01;
 
 
+
+
+
+
+
+
+
 /* ============================================================================================
-   3. CREAR PROCEDIMIENTOS DESDE LA CONEXIÓN G5Desa01
+   3. PROCEDIMIENTOS USADOS EN FRONT END 
+============================================================================================ */
+
+/* ============================================================================================
+   3. CREAR PROCEDIMIENTOS DESDE LA CONEXIION G5Desa01
 ============================================================================================ */
 
 ----------------------------------------------------------------------------------------------
--- PROCEDIMIENTO PARA AGREGAR PRODUCTO A UN ALMACÉN
+-- PROCEDIMIENTO PARA AGREGAR PRODUCTO A UN ALMACEN
 ----------------------------------------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE G5_AGREGAR_PRODUCTO_ALMACEN (
     p_id_producto IN NUMBER,
@@ -565,39 +574,6 @@ END;
 /
 ----------------------------------------------------------------------------------------------
 
-----------------------------------------------------------------------------------------------
--- LISTAR SUCURSALES
-----------------------------------------------------------------------------------------------
-
-CREATE OR REPLACE PROCEDURE G5_LISTAR_SUCURSALES (
-  p_resultado OUT SYS_REFCURSOR
-) AS
-BEGIN
-  OPEN p_resultado FOR
-    SELECT s.id_sucursal, s.nombre_sucursal
-    FROM alm_tablas.sucursal_tb s
-    ORDER BY s.id_sucursal;
-END;
-/
-
-
-----------------------------------------------------------------------------------------------
--- LISTAR ALMACENES POR SUCURSAL (solo activos)
-----------------------------------------------------------------------------------------------
-CREATE OR REPLACE PROCEDURE G5_LISTAR_ALMACENES_POR_SUCURSAL (
-  p_id_sucursal IN NUMBER,
-  p_resultado OUT SYS_REFCURSOR
-) AS
-BEGIN
-  OPEN p_resultado FOR
-    SELECT a.id_almacen, a.nombre_almacen
-    FROM alm_tablas.almacen_tb a
-    WHERE a.id_sucursal = p_id_sucursal
-      AND a.id_estado = 1
-    ORDER BY a.id_almacen;
-END;
-/
-
 
 
 ----------------------------------------------------------------------------------------------
@@ -625,6 +601,8 @@ END;
 /
 
 
+
+
 ----------------------------------------------------------------------------------------------
 -- LISTAR KARDEX POR PRODUCTO
 ----------------------------------------------------------------------------------------------
@@ -646,6 +624,43 @@ BEGIN
     ORDER BY i.id_almacen;
 END;
 /
+
+
+
+----------------------------------------------------------------------------------------------
+-- LISTAR SUCURSALES
+----------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE PROCEDURE G5_LISTAR_SUCURSALES (
+  p_resultado OUT SYS_REFCURSOR
+) AS
+BEGIN
+  OPEN p_resultado FOR
+    SELECT s.id_sucursal, s.nombre_sucursal
+    FROM alm_tablas.sucursal_tb s
+    ORDER BY s.id_sucursal;
+END;
+/
+
+
+
+----------------------------------------------------------------------------------------------
+-- LISTAR ALMACENES POR SUCURSAL (solo activos)
+----------------------------------------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE G5_LISTAR_ALMACENES_POR_SUCURSAL (
+  p_id_sucursal IN NUMBER,
+  p_resultado OUT SYS_REFCURSOR
+) AS
+BEGIN
+  OPEN p_resultado FOR
+    SELECT a.id_almacen, a.nombre_almacen
+    FROM alm_tablas.almacen_tb a
+    WHERE a.id_sucursal = p_id_sucursal
+      AND a.id_estado = 1
+    ORDER BY a.id_almacen;
+END;
+/
+
 
 
 ----------------------------------------------------------------------------------------------
@@ -703,6 +718,17 @@ END;
 
 
 /* ============================================================================================
+   AQUI TERMINAN LOS PROCEDIMIENTOS USADOS EN FRONT END 
+============================================================================================ */
+
+
+
+
+
+
+
+
+/* ============================================================================================
    4. PERMISOS DE EJECUCIÓN AL USUARIO FINAL DESDE desa
 ============================================================================================ */
 
@@ -723,7 +749,7 @@ GRANT SELECT ON inv_tablas.producto_tb TO G5UF01;
 
 
 /* ============================================================================================
-   5. EJEMPLO DE EJECUCIÓN (usuario final G5UF01)
+   5. EJEMPLO DE EJECUCIONN (usuario final G5UF01)
 ============================================================================================ */
 DECLARE
   v_resultado VARCHAR2(50);
@@ -733,7 +759,7 @@ BEGIN
   DBMS_OUTPUT.PUT_LINE('Resultado: '||v_resultado);
 
   G5Desa01.G5_LISTAR_SUCURSALES(v_cursor);
-  -- Aquí puedes FETCH desde el cursor o usarlo en tu backend
+
 
 END;
 /
@@ -1017,6 +1043,8 @@ CREATE SEQUENCE oper_tablas.SEQ_ALERTA_INVENTARIO START WITH 1 INCREMENT BY 1 NO
 
 -- Trigger para detectar bajo stock
 
+
+
 CREATE OR REPLACE TRIGGER inv_tablas.trg_alerta_inventario
 AFTER INSERT OR UPDATE ON inv_tablas.inventario_tb
 FOR EACH ROW
@@ -1120,15 +1148,18 @@ BEGIN
     :NEW.cantidad_disponible - :OLD.cantidad_disponible,
     v_tipo,
     SYS_CONTEXT('USERENV','SESSION_USER'),
-    NULL  -- puedes llenar con detalle si lo pasas desde la aplicación
+    NULL  
   );
 END;
 /
 
 -- reportes--
---  Productos más solicitados
+--  Productos mass solicitados
 
-CREATE OR REPLACE VIEW reporte_productos_mas_solicitados_vw AS
+
+
+
+CREATE OR REPLACE VIEW oper_tablas.reporte_productos_mas_solicitados_vw AS
 SELECT 
   p.id_producto,
   p.nombre_producto,
@@ -1145,7 +1176,7 @@ ORDER BY total_solicitado DESC;
 
 -- Consumo por departamento
 
-CREATE OR REPLACE VIEW reporte_consumo_departamento_vw AS
+CREATE OR REPLACE VIEW oper_tablas.reporte_consumo_departamento_vw AS
 SELECT 
   dep.id_departamento,
   dep.nombre_departamento,
@@ -1160,7 +1191,7 @@ ORDER BY total_entregado DESC;
 
 -- Histórico completo por producto 
 
-CREATE OR REPLACE VIEW reporte_kardex_producto_vw AS
+CREATE OR REPLACE VIEW inv_tablas.reporte_kardex_producto_vw AS
 SELECT 
   km.id_movimiento,
   km.id_producto,
@@ -1176,6 +1207,23 @@ FROM inv_tablas.kardex_movimientos_tb km
 ORDER BY km.fecha_movimiento DESC;
 
 -- Job programado para generación automática
+--antes del job 
+--
+GRANT CREATE JOB TO G5Desa01;
+
+-- Desde INV_TABLAS
+GRANT SELECT ON inv_tablas.producto_tb   TO oper_tablas WITH GRANT OPTION;
+GRANT SELECT ON inv_tablas.inventario_tb TO oper_tablas WITH GRANT OPTION;
+
+-- Desde ALM_TABLAS
+GRANT SELECT ON alm_tablas.departamentos_tb TO oper_tablas WITH GRANT OPTION;
+
+
+GRANT SELECT ON oper_tablas.reporte_productos_mas_solicitados_vw TO G5Desa01, G5UF01;
+GRANT SELECT ON oper_tablas.reporte_consumo_departamento_vw      TO G5Desa01, G5UF01;
+
+GRANT SELECT ON inv_tablas.reporte_kardex_producto_vw TO oper_tablas, G5Desa01, G5UF01;
+
 
 BEGIN
   DBMS_SCHEDULER.CREATE_JOB (

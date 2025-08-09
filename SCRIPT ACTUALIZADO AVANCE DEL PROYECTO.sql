@@ -487,9 +487,9 @@ CREATE OR REPLACE PROCEDURE G5_AGREGAR_PRODUCTO_ALMACEN (
     v_estado      NUMBER;
 BEGIN
     SELECT id_sucursal, id_estado
-    INTO v_id_sucursal, v_estado
-    FROM alm_tablas.almacen_tb
-    WHERE id_almacen = p_id_almacen;
+      INTO v_id_sucursal, v_estado
+      FROM alm_tablas.almacen_tb
+     WHERE id_almacen = p_id_almacen;
 
     IF v_estado <> 1 THEN
         p_resultado := 'ALMACEN INACTIVO';
@@ -497,8 +497,9 @@ BEGIN
     END IF;
 
     UPDATE inv_tablas.inventario_tb
-    SET cantidad_disponible = cantidad_disponible + p_cantidad
-    WHERE id_producto = p_id_producto AND id_almacen = p_id_almacen;
+       SET cantidad_disponible = cantidad_disponible + p_cantidad
+     WHERE id_producto = p_id_producto
+       AND id_almacen  = p_id_almacen;
 
     IF SQL%ROWCOUNT = 0 THEN
         INSERT INTO inv_tablas.inventario_tb (
@@ -514,8 +515,15 @@ BEGIN
     END IF;
 
     p_resultado := 'AGREGADO EXITOSO';
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        p_resultado := 'ALMACEN NO EXISTE';
+    WHEN OTHERS THEN
+        p_resultado := 'ERROR: ' || SQLERRM;
 END;
 /
+
 
 ----------------------------------------------------------------------------------------------
 -- PROCEDIMIENTO PARA REBAJAR PRODUCTO DE UN ALMACÉN
@@ -529,9 +537,10 @@ CREATE OR REPLACE PROCEDURE G5_REBAJAR_PRODUCTO_ALMACEN (
     v_stock_actual NUMBER;
 BEGIN
     SELECT cantidad_disponible
-    INTO v_stock_actual
-    FROM inv_tablas.inventario_tb
-    WHERE id_producto = p_id_producto AND id_almacen = p_id_almacen;
+      INTO v_stock_actual
+      FROM inv_tablas.inventario_tb
+     WHERE id_producto = p_id_producto
+       AND id_almacen  = p_id_almacen;
 
     IF v_stock_actual < p_cantidad THEN
         p_resultado := 'STOCK INSUFICIENTE';
@@ -539,10 +548,17 @@ BEGIN
     END IF;
 
     UPDATE inv_tablas.inventario_tb
-    SET cantidad_disponible = cantidad_disponible - p_cantidad
-    WHERE id_producto = p_id_producto AND id_almacen = p_id_almacen;
+       SET cantidad_disponible = cantidad_disponible - p_cantidad
+     WHERE id_producto = p_id_producto
+       AND id_almacen  = p_id_almacen;
 
     p_resultado := 'REBAJA EXITOSA';
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        p_resultado := 'SIN REGISTRO EN ALMACEN';
+    WHEN OTHERS THEN
+        p_resultado := 'ERROR: ' || SQLERRM;
 END;
 /
 
@@ -695,13 +711,14 @@ CREATE OR REPLACE PROCEDURE G5_LISTAR_INVENTARIO_ALMACEN (
 BEGIN
   OPEN p_resultado FOR
     SELECT 
-      i.id_inventario,
-      p.nombre_producto,
-      p.descripcion,
-      p.precio_unitario,
-      u.nombre AS nombre_unidad_medida,
-      e.nombre_estado,
-      i.cantidad_disponible
+      i.id_inventario,          
+      p.id_producto,            
+      p.nombre_producto,        
+      p.descripcion,            
+      p.precio_unitario,        
+      u.nombre AS nombre_unidad_medida, 
+      e.nombre_estado,          
+      i.cantidad_disponible     
     FROM inv_tablas.inventario_tb i
       JOIN inv_tablas.producto_tb p 
         ON i.id_producto = p.id_producto
@@ -713,6 +730,7 @@ BEGIN
     ORDER BY p.id_producto;
 END;
 /
+
 ----------------------------------------------------------------------------------------------
 
 

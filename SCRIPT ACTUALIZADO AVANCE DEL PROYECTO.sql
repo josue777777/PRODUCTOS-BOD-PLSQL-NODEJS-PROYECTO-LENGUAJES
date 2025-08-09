@@ -163,12 +163,8 @@ CREATE TABLE detalle_solicitud_tb(
     cantidad_entregada NUMBER
 );
 
-
-
-
-
-
--------------------------------------------------------------------------------------------------DIVISION PROXIMO PASO DEL PROYECTO DESA PROYECTO Y USUARIO FINALES 
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+------ DIVISION PROXIMO PASO DEL PROYECTO DESA PROYECTO Y USUARIO FINALES 
 
 -- Se corre en sys o system
 
@@ -196,7 +192,6 @@ CREATE ROLE G5_ROL_UF;
 
 GRANT CREATE SESSION TO G5_ROL_UF;
 GRANT G5_ROL_UF TO G5UF01;
-
 
 
 --SELECT * FROM alm_tablas.estado_tb;
@@ -346,9 +341,6 @@ FROM dba_role_privs
 WHERE granted_role LIKE 'G5_ROL%'
 ORDER BY grantee;
 
-
-
-
 --------------------------------------------insersiones---------------------------------------------
 
 --alm_tablas
@@ -442,18 +434,9 @@ COMMIT;
 
 
 
------------------------------------------------------------------------------------------------------
-/* ============================================================================================
-   FRONT END - PROCEDIMIENTOS Y PERMISOS
-   ============================================================================================
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-   ? Los GRANT sobre tablas y secuencias se corren como SYS o SYSTEM.
-   ? La creación de la secuencia se corre como inv_tablas.
-   ? Los procedimientos se crean en G5Desa01 (usuario desarrollador).
-   ? Al final se dan permisos de EXECUTE a G5UF01 (usuario final).
-
-============================================================================================ */
-
+-- FRONT END - PROCEDIMIENTOS Y PERMISOS
 /* ============================================================================================
    1. DAR PERMISOS DESDE SYS O SYSTEM PARA QUE DESARROLLADOR PUEDA VER TABLAS Y SECUENCIA
 ============================================================================================ */
@@ -471,10 +454,8 @@ GRANT SELECT ON inv_tablas.unidad_medida_tb TO G5Desa01;
 -- Permiso a inv_tablas para crear la secuencia
 GRANT CREATE SEQUENCE TO inv_tablas;
 
-
-
 /* ============================================================================================
-   2. CREAR SECUENCIA DESDE LA CONEXIÓN inv_tablas
+   2. CREAR SECUENCIA DESDE LA CONEXION inv_tablas
 ============================================================================================ */
 -- Conectado como inv_tablas:
 CREATE SEQUENCE inv_tablas.SEQ_INVENTARIO
@@ -484,13 +465,12 @@ NOCACHE;
 
 GRANT SELECT ON inv_tablas.SEQ_INVENTARIO TO G5Desa01;
 
-
 /* ============================================================================================
    3. CREAR PROCEDIMIENTOS DESDE LA CONEXIÓN G5Desa01
 ============================================================================================ */
 
 ----------------------------------------------------------------------------------------------
--- PROCEDIMIENTO PARA AGREGAR PRODUCTO A UN ALMACÉN
+-- PROCEDIMIENTO PARA AGREGAR PRODUCTO A UN ALMACEN
 ----------------------------------------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE G5_AGREGAR_PRODUCTO_ALMACEN (
     p_id_producto IN NUMBER,
@@ -533,9 +513,6 @@ END;
 /
 
 ----------------------------------------------------------------------------------------------
-
-
-----------------------------------------------------------------------------------------------
 -- PROCEDIMIENTO PARA REBAJAR PRODUCTO DE UN ALMACÉN
 ----------------------------------------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE G5_REBAJAR_PRODUCTO_ALMACEN (
@@ -563,7 +540,6 @@ BEGIN
     p_resultado := 'REBAJA EXITOSA';
 END;
 /
-----------------------------------------------------------------------------------------------
 
 ----------------------------------------------------------------------------------------------
 -- LISTAR SUCURSALES
@@ -597,8 +573,6 @@ BEGIN
     ORDER BY a.id_almacen;
 END;
 /
-
-
 
 ----------------------------------------------------------------------------------------------
 -- LISTAR PRODUCTOS
@@ -647,7 +621,6 @@ BEGIN
 END;
 /
 
-
 ----------------------------------------------------------------------------------------------
 -- LISTAR TODOS LOS ALMACENES CON SUCURSAL
 ----------------------------------------------------------------------------------------------
@@ -667,10 +640,8 @@ BEGIN
 END;
 /
 
-
-
 ----------------------------------------------------------------------------------------------
--- LISTAR INVENTARIO FILTRADO POR ALMACÉN
+-- LISTAR INVENTARIO FILTRADO POR ALMACEN
 ----------------------------------------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE G5_LISTAR_INVENTARIO_ALMACEN (
   p_id_almacen IN NUMBER,
@@ -697,15 +668,12 @@ BEGIN
     ORDER BY p.id_producto;
 END;
 /
-
-
 ----------------------------------------------------------------------------------------------
 
 
 /* ============================================================================================
-   4. PERMISOS DE EJECUCIÓN AL USUARIO FINAL DESDE desa
+   4. PERMISOS DE EJECUCION AL USUARIO FINAL DESDE desa
 ============================================================================================ */
-
 
 GRANT EXECUTE ON G5Desa01.G5_AGREGAR_PRODUCTO_ALMACEN TO G5UF01;
 GRANT EXECUTE ON G5Desa01.G5_REBAJAR_PRODUCTO_ALMACEN TO G5UF01;
@@ -716,14 +684,11 @@ GRANT EXECUTE ON G5Desa01.G5_LISTAR_KARDEX_PRODUCTO TO G5UF01;
 GRANT EXECUTE ON G5Desa01.G5_LISTAR_ALMACENES_CON_SUCURSAL TO G5UF01;
 GRANT EXECUTE ON G5Desa01.G5_LISTAR_INVENTARIO_ALMACEN TO G5UF01;
 
-
-
 -- en inv_tablas
 GRANT SELECT ON inv_tablas.producto_tb TO G5UF01;
 
-
 /* ============================================================================================
-   5. EJEMPLO DE EJECUCIÓN (usuario final G5UF01)
+   5. EJEMPLO DE EJECUCION (usuario final G5UF01)
 ============================================================================================ */
 DECLARE
   v_resultado VARCHAR2(50);
@@ -784,220 +749,428 @@ CREATE TABLE oper_tablas.rechazos_tb (
 
 -- Transaccion Principal --
 
+-- Inventario inicial para pruebas
+-- SE CORRE EN INV_TABLAS
+INSERT INTO inv_tablas.inventario_tb
+    (id_inventario, id_producto, id_almacen, cantidad_disponible, stock_minimo, stock_maximo, id_estado)
+VALUES
+    (1, 100, 1, 100, 0, 0, 1);  
+
+INSERT INTO inv_tablas.inventario_tb
+    (id_inventario, id_producto, id_almacen, cantidad_disponible, stock_minimo, stock_maximo, id_estado)
+VALUES
+    (2, 101, 1, 0, 0, 0, 1);    
+
+INSERT INTO inv_tablas.inventario_tb
+    (id_inventario, id_producto, id_almacen, cantidad_disponible, stock_minimo, stock_maximo, id_estado)
+VALUES
+    (3, 102, 1, 20, 0, 0, 1);   
+
+INSERT INTO inv_tablas.inventario_tb
+    (id_inventario, id_producto, id_almacen, cantidad_disponible, stock_minimo, stock_maximo, id_estado)
+VALUES
+    (4, 103, 1, 50, 0, 0, 1);   
+
+INSERT INTO inv_tablas.inventario_tb
+    (id_inventario, id_producto, id_almacen, cantidad_disponible, stock_minimo, stock_maximo, id_estado)
+VALUES
+    (5, 104, 1, 0, 0, 0, 1);    
+
+INSERT INTO inv_tablas.inventario_tb
+    (id_inventario, id_producto, id_almacen, cantidad_disponible, stock_minimo, stock_maximo, id_estado)
+VALUES
+    (6, 105, 1, 60, 0, 0, 1);  
+COMMIT;    
+
+-- Restaurar inventario a cantidades originales
+UPDATE inv_tablas.inventario_tb
+SET cantidad_disponible = CASE id_producto
+    WHEN 100 THEN 100  
+    WHEN 101 THEN 0    
+    WHEN 102 THEN 20   
+    WHEN 103 THEN 50   
+    WHEN 104 THEN 0    
+    WHEN 105 THEN 60  
+END
+WHERE id_producto BETWEEN 100 AND 105;
+
+COMMIT;
+
+
+SELECT * FROM INV_TABLAS.INVENTARIO_TB;
+
+CREATE TABLE oper_tablas.peticion_tb (
+    id_peticion         NUMBER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    id_usuario          NUMBER       NOT NULL,
+    id_departamento     NUMBER       NOT NULL,
+    id_producto         NUMBER       NOT NULL,
+    cantidad_requerida  NUMBER(12,2) NOT NULL CHECK (cantidad_requerida > 0),
+    estado              NUMBER(1)    DEFAULT 0 NOT NULL CHECK (estado IN (0,1)), -- 0=pending, 1=atendida
+    fecha_creacion      DATE         DEFAULT SYSDATE NOT NULL,
+    fecha_atencion      DATE,
+    resultado_msg       VARCHAR2(4000)
+);
+
+-- FK a usuario
+ALTER TABLE oper_tablas.peticion_tb
+  ADD CONSTRAINT fk_pet_usuario
+  FOREIGN KEY (id_usuario)
+  REFERENCES oper_tablas.usuario_tb (id_usuario);
+
+-- FK a departamento
+ALTER TABLE oper_tablas.peticion_tb
+  ADD CONSTRAINT fk_pet_departamento
+  FOREIGN KEY (id_departamento)
+  REFERENCES alm_tablas.departamentos_tb (id_departamento);
+
+-- FK a producto
+ALTER TABLE oper_tablas.peticion_tb
+  ADD CONSTRAINT fk_pet_producto
+  FOREIGN KEY (id_producto)
+  REFERENCES inv_tablas.producto_tb (id_producto);
+
+-- �ndice para barrer pendientes r�pidamente
+CREATE INDEX oper_tablas.ix_peticion_estado
+  ON oper_tablas.peticion_tb (estado, fecha_creacion);
+
+
+
+-- 2. agregar v�nculo id_peticion en solicitud_tb
+ALTER TABLE oper_tablas.solicitud_tb ADD (id_peticion NUMBER NULL);
+ALTER TABLE oper_tablas.solicitud_tb ADD CONSTRAINT fk_solicitud_peticion
+  FOREIGN KEY (id_peticion) REFERENCES oper_tablas.peticion_tb (id_peticion);
+CREATE INDEX oper_tablas.ix_solicitud_id_peticion ON oper_tablas.solicitud_tb (id_peticion);
+
+-- 3. procedimiento: seleccionar siguiente petici�n pendiente (bloquea la fila)
+CREATE OR REPLACE PROCEDURE oper_tablas.seleccionaPeticion (
+    rPeticion OUT oper_tablas.peticion_tb%ROWTYPE,
+    vTermina  OUT NUMBER
+) AS
+    CURSOR cPet IS
+        SELECT *
+          FROM oper_tablas.peticion_tb
+         WHERE estado = 0
+         ORDER BY fecha_creacion, id_peticion
+         FOR UPDATE SKIP LOCKED;
+BEGIN
+    OPEN cPet;
+    FETCH cPet INTO rPeticion;
+    IF cPet%NOTFOUND THEN
+        vTermina := 1;
+    ELSE
+        vTermina := 0;
+    END IF;
+    CLOSE cPet;
+END;
+/
+
+-- 4. PROCEDIMIENTO PRINCIPAL
 CREATE OR REPLACE PROCEDURE oper_tablas.G5_SOLICITAR_PRODUCTO
 (
     p_id_usuario       IN  NUMBER,
     p_id_departamento  IN  NUMBER,
     p_id_producto      IN  NUMBER,
     p_cantidad         IN  NUMBER,
-    p_mensaje          OUT VARCHAR2
+    p_mensaje          OUT VARCHAR2,
+    p_id_peticion      IN  NUMBER DEFAULT NULL
 ) AUTHID DEFINER
 AS
     v_existe_usuario     NUMBER := 0;
     v_existe_depto       NUMBER := 0;
     v_existe_producto    NUMBER := 0;
-
     v_id_sucursal        NUMBER;
     v_precio_unitario    NUMBER := 0;
-
     v_stock_total        NUMBER := 0;
     v_a_entregar_total   NUMBER := 0;
     v_rechazado          NUMBER := 0;
     v_pendiente          NUMBER := 0;
     v_monto_total        NUMBER := 0;
-
     v_id_factura         NUMBER;
     v_id_solicitud       NUMBER;
     v_nuevo_detalle_id   NUMBER;
+    v_dep  NUMBER := p_id_departamento;
+    v_prod NUMBER := p_id_producto;
+    v_cant NUMBER := p_cantidad;
 BEGIN
-    -- 1) Validaciones
-    SELECT COUNT(*) INTO v_existe_usuario
-      FROM oper_tablas.usuario_tb
-     WHERE id_usuario = p_id_usuario;
-    IF v_existe_usuario = 0 THEN p_mensaje := 'Usuario inválido'; RETURN; END IF;
-
-    SELECT COUNT(*) INTO v_existe_depto
-      FROM alm_tablas.departamentos_tb
-     WHERE id_departamento = p_id_departamento;
-    IF v_existe_depto = 0 THEN p_mensaje := 'Departamento inválido'; RETURN; END IF;
-
-    SELECT COUNT(*) INTO v_existe_producto
-      FROM inv_tablas.producto_tb
-     WHERE id_producto = p_id_producto;
-    IF v_existe_producto = 0 THEN p_mensaje := 'Producto inválido'; RETURN; END IF;
-
-    IF p_cantidad IS NULL OR p_cantidad <= 0 THEN
-        p_mensaje := 'Cantidad solicitada inválida'; RETURN;
+    -- 4.1. si viene id_peticion, leer datos de la bandeja y bloquear la fila
+    IF p_id_peticion IS NOT NULL THEN
+        BEGIN
+            SELECT id_departamento, id_producto, cantidad_requerida
+              INTO v_dep, v_prod, v_cant
+              FROM oper_tablas.peticion_tb
+             WHERE id_peticion = p_id_peticion
+               AND estado = 0
+             FOR UPDATE;
+        EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                p_mensaje := 'Petici�n inv�lida o ya atendida (id='||p_id_peticion||')';
+                RETURN;
+        END;
     END IF;
 
-    -- 2) Datos base
-    SELECT id_sucursal
-      INTO v_id_sucursal
-      FROM alm_tablas.departamentos_tb
-     WHERE id_departamento = p_id_departamento;
+    -- 4.2. validaciones
+    SELECT COUNT(*) INTO v_existe_usuario FROM oper_tablas.usuario_tb WHERE id_usuario = p_id_usuario;
+    IF v_existe_usuario = 0 THEN p_mensaje := 'Usuario inv�lido'; RETURN; END IF;
 
-    SELECT precio_unitario
-      INTO v_precio_unitario
-      FROM inv_tablas.producto_tb
-     WHERE id_producto = p_id_producto;
+    SELECT COUNT(*) INTO v_existe_depto FROM alm_tablas.departamentos_tb WHERE id_departamento = v_dep;
+    IF v_existe_depto = 0 THEN p_mensaje := 'Departamento inv�lido'; RETURN; END IF;
 
-    -- 3) Stock total
+    SELECT COUNT(*) INTO v_existe_producto FROM inv_tablas.producto_tb WHERE id_producto = v_prod;
+    IF v_existe_producto = 0 THEN p_mensaje := 'Producto inv�lido'; RETURN; END IF;
+
+    IF v_cant IS NULL OR v_cant <= 0 THEN p_mensaje := 'Cantidad solicitada inv�lida'; RETURN; END IF;
+
+    -- 4.3. datos base
+    SELECT id_sucursal INTO v_id_sucursal
+      FROM alm_tablas.departamentos_tb WHERE id_departamento = v_dep;
+
+    SELECT precio_unitario INTO v_precio_unitario
+      FROM inv_tablas.producto_tb WHERE id_producto = v_prod;
+
+    -- 4.4. stock total y reparto inicial
     SELECT NVL(SUM(i.cantidad_disponible), 0)
       INTO v_stock_total
       FROM inv_tablas.inventario_tb i
       JOIN alm_tablas.almacen_tb a ON a.id_almacen = i.id_almacen
      WHERE a.id_sucursal = v_id_sucursal
-       AND i.id_producto = p_id_producto;
+       AND i.id_producto = v_prod;
 
     IF v_stock_total <= 0 THEN
-        v_a_entregar_total := 0;
-        v_rechazado        := p_cantidad;
-    ELSIF v_stock_total < p_cantidad THEN
-        v_a_entregar_total := v_stock_total;
-        v_rechazado        := p_cantidad - v_stock_total;
+        v_a_entregar_total := 0; v_rechazado := v_cant;
+    ELSIF v_stock_total < v_cant THEN
+        v_a_entregar_total := v_stock_total; v_rechazado := v_cant - v_stock_total;
     ELSE
-        v_a_entregar_total := p_cantidad;
-        v_rechazado        := 0;
+        v_a_entregar_total := v_cant; v_rechazado := 0;
     END IF;
 
-    -- 4) Factura
+    -- 4.5. factura
     SELECT NVL(MAX(id_factura),0) + 1 INTO v_id_factura FROM oper_tablas.factura_tb;
     INSERT INTO oper_tablas.factura_tb (id_factura, fecha, monto_total)
     VALUES (v_id_factura, SYSDATE, 0);
 
-    -- 5) Solicitud
+    -- 4.6. solicitud (guarda id_peticion si vino)
     SELECT NVL(MAX(id_solicitud),0) + 1 INTO v_id_solicitud FROM oper_tablas.solicitud_tb;
-    INSERT INTO oper_tablas.solicitud_tb (id_solicitud, fecha, id_departamento, id_factura, id_usuario)
-    VALUES (v_id_solicitud, SYSDATE, p_id_departamento, v_id_factura, p_id_usuario);
+    INSERT INTO oper_tablas.solicitud_tb
+        (id_solicitud, fecha, id_departamento, id_factura, id_usuario, id_peticion)
+    VALUES
+        (v_id_solicitud, SYSDATE, v_dep, v_id_factura, p_id_usuario, p_id_peticion);
 
-    -- 6) Rechazo (si aplica)
+    -- 4.7. rechazo (si aplica)
     IF v_rechazado > 0 THEN
-        INSERT INTO oper_tablas.rechazos_tb (id_solicitud, id_producto, cantidad_solicitada, cantidad_rechazada)
-        VALUES (v_id_solicitud, p_id_producto, p_cantidad, v_rechazado);
+        INSERT INTO oper_tablas.rechazos_tb
+            (id_solicitud, id_producto, cantidad_solicitada, cantidad_rechazada)
+        VALUES
+            (v_id_solicitud, v_prod, v_cant, v_rechazado);
     END IF;
 
-    -- 7) Reparto de entrega
+    -- 4.8. reparto por inventarios
     v_pendiente := v_a_entregar_total;
-
     FOR reg IN (
         SELECT i.id_inventario, i.cantidad_disponible, i.stock_minimo, i.id_almacen
           FROM inv_tablas.inventario_tb i
           JOIN alm_tablas.almacen_tb a ON a.id_almacen = i.id_almacen
          WHERE a.id_sucursal = v_id_sucursal
-           AND i.id_producto = p_id_producto
+           AND i.id_producto = v_prod
          ORDER BY i.id_inventario
     ) LOOP
         EXIT WHEN v_pendiente <= 0;
-
-        DECLARE
-            v_entregar NUMBER;
-            v_restante NUMBER;
-        BEGIN
+        DECLARE v_entregar NUMBER; v_restante NUMBER; BEGIN
             v_entregar := LEAST(reg.cantidad_disponible, v_pendiente);
-
             SELECT NVL(MAX(id_detalle_solicitud),0) + 1
               INTO v_nuevo_detalle_id
               FROM oper_tablas.detalle_solicitud_tb;
-
-            INSERT INTO oper_tablas.detalle_solicitud_tb (
-                id_detalle_solicitud, id_solicitud, id_inventario,
-                cantidad_solicitada, cantidad_entregada
-            ) VALUES (
-                v_nuevo_detalle_id, v_id_solicitud, reg.id_inventario,
-                v_pendiente, v_entregar
-            );
-
+            INSERT INTO oper_tablas.detalle_solicitud_tb
+                (id_detalle_solicitud, id_solicitud, id_inventario,
+                 cantidad_solicitada, cantidad_entregada)
+            VALUES
+                (v_nuevo_detalle_id, v_id_solicitud, reg.id_inventario,
+                 v_pendiente, v_entregar);
             UPDATE inv_tablas.inventario_tb
                SET cantidad_disponible = cantidad_disponible - v_entregar
              WHERE id_inventario = reg.id_inventario;
-
-            v_restante    := reg.cantidad_disponible - v_entregar;
-            v_pendiente   := v_pendiente - v_entregar;
+            v_restante := reg.cantidad_disponible - v_entregar;
+            v_pendiente := v_pendiente - v_entregar;
             v_monto_total := v_monto_total + (v_entregar * v_precio_unitario);
-
             IF v_restante < reg.stock_minimo THEN
-                DBMS_OUTPUT.PUT_LINE('Alerta: stock bajo en almacén ' || reg.id_almacen ||
-                                     ' para producto ' || p_id_producto);
+                DBMS_OUTPUT.PUT_LINE('Alerta: stock bajo en almac�n '||reg.id_almacen||
+                                     ' para producto '||v_prod);
             END IF;
         END;
     END LOOP;
 
-    -- 8) Actualizar factura
+    -- 4.9. actualizar factura
     UPDATE oper_tablas.factura_tb
        SET monto_total = v_monto_total
      WHERE id_factura = v_id_factura;
 
-    COMMIT;
-
-    -- 9) Mensaje
+    -- 4.10. mensaje
     IF v_a_entregar_total = 0 THEN
-        p_mensaje := 'Solicitud ' || v_id_solicitud ||
-                     ' rechazada: sin stock disponible. Rechazado: ' || v_rechazado;
+        p_mensaje := 'Solicitud '||v_id_solicitud||' rechazada: sin stock. Rechazado: '||v_rechazado;
     ELSIF v_rechazado > 0 THEN
-        p_mensaje := 'Solicitud ' || v_id_solicitud ||
-                     ' atendida parcialmente. Entregado: ' || v_a_entregar_total ||
-                     ', Rechazado: ' || v_rechazado || '. Monto: ' || v_monto_total;
+        p_mensaje := 'Solicitud '||v_id_solicitud||' parcial. Entregado: '||v_a_entregar_total||
+                     ', Rechazado: '||v_rechazado||'. Monto: '||v_monto_total;
     ELSE
-        p_mensaje := 'Solicitud ' || v_id_solicitud ||
-                     ' atendida completamente. Entregado: ' || v_a_entregar_total ||
-                     '. Monto: ' || v_monto_total;
+        p_mensaje := 'Solicitud '||v_id_solicitud||' completa. Entregado: '||v_a_entregar_total||
+                     '. Monto: '||v_monto_total;
     END IF;
 
+    -- 4.11. cerrar petici�n si vino desde la bandeja
+    IF p_id_peticion IS NOT NULL THEN
+        UPDATE oper_tablas.peticion_tb
+           SET estado = 1, fecha_atencion = SYSDATE, resultado_msg = p_mensaje
+         WHERE id_peticion = p_id_peticion;
+    END IF;
+
+    COMMIT;
 EXCEPTION
     WHEN OTHERS THEN
         ROLLBACK;
-        p_mensaje := 'Error: ' || SQLERRM;
+        p_mensaje := 'Error: '||SQLERRM;
+        IF p_id_peticion IS NOT NULL THEN
+            UPDATE oper_tablas.peticion_tb
+               SET resultado_msg = p_mensaje
+             WHERE id_peticion = p_id_peticion;
+            COMMIT;
+        END IF;
 END;
 /
 
+-- 5. procedimiento: atiende todas las peticiones estado=0 
+CREATE OR REPLACE PROCEDURE oper_tablas.pruebaActualizaInventario AS
+    rPeticion oper_tablas.peticion_tb%ROWTYPE;
+    fin       NUMBER;
+    v_msg     VARCHAR2(4000);
+BEGIN
+    LOOP
+        oper_tablas.seleccionaPeticion(rPeticion, fin);
+        EXIT WHEN fin = 1;
 
--- Caso 1: stock suficiente
+        oper_tablas.G5_SOLICITAR_PRODUCTO(
+            p_id_usuario      => rPeticion.id_usuario,        
+            p_id_departamento => rPeticion.id_departamento,   
+            p_id_producto     => rPeticion.id_producto,
+            p_cantidad        => rPeticion.cantidad_requerida,
+            p_mensaje         => v_msg,
+            p_id_peticion     => rPeticion.id_peticion
+        );
+    END LOOP;
+END;
+/
+
+-- 6. INSERTS DE EJEMPLO (peticiones pendientes)
+-- 6.1 STOCK SUFICIENTE (entrega completa): 103 (tiene 100), 105 (dejamos 80)
+INSERT INTO oper_tablas.peticion_tb
+    (id_usuario, id_departamento, id_producto, cantidad_requerida, estado, fecha_creacion)
+VALUES (2, 1, 103, 8, 0, SYSDATE);
+
+INSERT INTO oper_tablas.peticion_tb
+    (id_usuario, id_departamento, id_producto, cantidad_requerida, estado, fecha_creacion)
+VALUES (2, 1, 105, 20, 0, SYSDATE);
+
+-- 6.2 STOCK INSUFICIENTE (entrega parcial): 100 (=40 -> pide 50), 104 (=20 -> pide 30)
+INSERT INTO oper_tablas.peticion_tb
+    (id_usuario, id_departamento, id_producto, cantidad_requerida, estado, fecha_creacion)
+VALUES (2, 1, 100, 50, 0, SYSDATE);
+
+INSERT INTO oper_tablas.peticion_tb
+    (id_usuario, id_departamento, id_producto, cantidad_requerida, estado, fecha_creacion)
+VALUES (2, 1, 104, 30, 0, SYSDATE);
+
+-- 6.3 SIN STOCK (rechazo total): 101 (=0), 102 (=0)
+INSERT INTO oper_tablas.peticion_tb
+    (id_usuario, id_departamento, id_producto, cantidad_requerida, estado, fecha_creacion)
+VALUES (2, 1, 101, 10, 0, SYSDATE);
+
+INSERT INTO oper_tablas.peticion_tb
+    (id_usuario, id_departamento, id_producto, cantidad_requerida, estado, fecha_creacion)
+VALUES (2, 1, 102, 15, 0, SYSDATE);
+
+COMMIT;
+
+SELECT * FROM OPER_TABLAS.PETICION_TB;
+
+-- 7. EJECUCI�N (uno a uno o en lote)
+-- 7.1 en lote (atiende todas las estado=0)
+BEGIN
+  oper_tablas.pruebaActualizaInventario;
+END;
+/
+
+-- 7.2 individual (si quer�s disparar una espec�fica por id)
 SET SERVEROUTPUT ON;
 DECLARE
-    v_msg VARCHAR2(500);
+  v_msg VARCHAR2(4000);
 BEGIN
-    oper_tablas.G5_SOLICITAR_PRODUCTO(
-        p_id_usuario      => 2,
-        p_id_departamento => 1,
-        p_id_producto     => 100,
-        p_cantidad        => 5, 
-        p_mensaje         => v_msg
-    );
-    DBMS_OUTPUT.PUT_LINE(v_msg);
+  oper_tablas.G5_SOLICITAR_PRODUCTO(
+    p_id_usuario      => 2,
+    p_id_departamento => NULL,   -- ignorado cuando se pasa p_id_peticion
+    p_id_producto     => NULL,   -- ignorado
+    p_cantidad        => NULL,   -- ignorado
+    p_mensaje         => v_msg,
+    p_id_peticion     => (SELECT MIN(id_peticion) FROM oper_tablas.peticion_tb WHERE estado=0)
+  );
+  DBMS_OUTPUT.PUT_LINE(v_msg);
 END;
 /
 
-SELECT * FROM oper_tablas.rechazos_tb
-WHERE id_solicitud = (SELECT MAX(id_solicitud) FROM oper_tablas.solicitud_tb);
+-- 8. CONSULTAS DE CONTROL
+-- 8.1 peticiones 
+SELECT id_peticion, id_usuario, id_departamento, id_producto, cantidad_requerida,
+       estado, fecha_creacion, fecha_atencion, resultado_msg
+  FROM oper_tablas.peticion_tb
+ ORDER BY id_peticion;
 
--- Casp 2: stock insuficiente 
-SET SERVEROUTPUT ON;
-DECLARE
-    v_msg VARCHAR2(500);
-BEGIN
-    oper_tablas.G5_SOLICITAR_PRODUCTO(
-        p_id_usuario      => 2,
-        p_id_departamento => 2,
-        p_id_producto     => 107,
-        p_cantidad        => 55, 
-        p_mensaje         => v_msg
-    );
-    DBMS_OUTPUT.PUT_LINE(v_msg);
-END;
-/
+-- 8.2 solicitudes recientes (enlazadas a peticiones)
+SELECT s.id_solicitud, s.fecha, s.id_departamento, s.id_usuario, s.id_peticion, s.id_factura
+  FROM oper_tablas.solicitud_tb s
+ WHERE s.id_peticion IS NOT NULL
+ ORDER BY s.id_solicitud DESC;
 
--- Consultas
+-- 8.3 facturas de esas solicitudes
+SELECT f.id_factura, f.fecha, f.monto_total
+  FROM oper_tablas.factura_tb f
+ WHERE EXISTS (SELECT 1 FROM oper_tablas.solicitud_tb s
+                WHERE s.id_factura = f.id_factura
+                  AND s.id_peticion IS NOT NULL)
+ ORDER BY f.id_factura DESC;
 
-SELECT * FROM oper_tablas.rechazos_tb
-WHERE id_solicitud = (SELECT MAX(id_solicitud) FROM oper_tablas.solicitud_tb);
-SELECT * FROM oper_tablas.solicitud_tb ORDER BY id_solicitud DESC;
-SELECT * FROM oper_tablas.detalle_solicitud_tb WHERE id_solicitud = (SELECT MAX(id_solicitud) FROM oper_tablas.solicitud_tb);
-SELECT * FROM oper_tablas.factura_tb WHERE id_factura = (SELECT id_factura FROM oper_tablas.solicitud_tb WHERE id_solicitud = (SELECT MAX(id_solicitud) FROM oper_tablas.solicitud_tb));
-SELECT * FROM inv_tablas.inventario_tb WHERE id_producto = 100;
+-- 8.4 detalles de solicitud
+SELECT d.id_detalle_solicitud, d.id_solicitud, d.id_inventario,
+       d.cantidad_solicitada, d.cantidad_entregada
+  FROM oper_tablas.detalle_solicitud_tb d
+ WHERE d.id_solicitud IN (SELECT s.id_solicitud
+                            FROM oper_tablas.solicitud_tb s
+                           WHERE s.id_peticion IS NOT NULL)
+ ORDER BY d.id_detalle_solicitud DESC;
+
+-- 8.5 rechazos (si hubo)
+SELECT r.id_solicitud, r.id_producto, r.cantidad_solicitada, r.cantidad_rechazada
+  FROM oper_tablas.rechazos_tb r
+ WHERE r.id_solicitud IN (SELECT s.id_solicitud
+                            FROM oper_tablas.solicitud_tb s
+                           WHERE s.id_peticion IS NOT NULL)
+ ORDER BY r.id_solicitud DESC;
+
+-- 8.6 inventario del/los productos usados en la sucursal del depto (opcional)
+SELECT i.id_inventario, i.id_producto, i.cantidad_disponible, i.stock_minimo, a.id_almacen, a.id_sucursal
+  FROM inv_tablas.inventario_tb i
+  JOIN alm_tablas.almacen_tb a ON a.id_almacen = i.id_almacen
+ WHERE i.id_producto IN (SELECT id_producto FROM oper_tablas.peticion_tb);
+
+
+-- 9. LIMPIEZA DE DATOS DE PRUEBA
+
+DELETE FROM oper_tablas.detalle_solicitud_tb;
+DELETE FROM oper_tablas.rechazos_tb;
+DELETE FROM oper_tablas.solicitud_tb;
+DELETE FROM oper_tablas.factura_tb;
+DELETE FROM oper_tablas.peticion_tb;
+
+COMMIT;
 
 ------------alertas------
 -- Tabla de alertas
-
+-- se crea en oper_tablas
 CREATE TABLE oper_tablas.alerta_inventario_tb (
   id_alerta         NUMBER CONSTRAINT pk_alerta_inventario_tb PRIMARY KEY,
   id_inventario     NUMBER,
@@ -1012,11 +1185,11 @@ CREATE TABLE oper_tablas.alerta_inventario_tb (
 );
 
  -- Crea secuencia para las alertas:
-
+-- se crea en oper_tablas
 CREATE SEQUENCE oper_tablas.SEQ_ALERTA_INVENTARIO START WITH 1 INCREMENT BY 1 NOCACHE;
 
 -- Trigger para detectar bajo stock
-
+-- se crea en inv_tablas
 CREATE OR REPLACE TRIGGER inv_tablas.trg_alerta_inventario
 AFTER INSERT OR UPDATE ON inv_tablas.inventario_tb
 FOR EACH ROW
@@ -1066,8 +1239,8 @@ BEGIN
 END;
 /
 
--- Histórico de movimientos - Tabla de log de movimientos
-
+-- Historico de movimientos - Tabla de log de movimientos
+-- se crea en inv_tablas
 CREATE TABLE inv_tablas.kardex_movimientos_tb (
   id_movimiento         NUMBER CONSTRAINT pk_kardex_movimientos PRIMARY KEY,
   id_inventario         NUMBER,
@@ -1084,7 +1257,7 @@ CREATE TABLE inv_tablas.kardex_movimientos_tb (
 CREATE SEQUENCE inv_tablas.SEQ_KARDEX_MOV START WITH 1 INCREMENT BY 1 NOCACHE;
 
 -- Trigger para registrar cambios en inventario 
-
+-- se crea en inv_tablas
 CREATE OR REPLACE TRIGGER inv_tablas.trg_kardex_inventario
 BEFORE UPDATE ON inv_tablas.inventario_tb
 FOR EACH ROW
@@ -1120,14 +1293,14 @@ BEGIN
     :NEW.cantidad_disponible - :OLD.cantidad_disponible,
     v_tipo,
     SYS_CONTEXT('USERENV','SESSION_USER'),
-    NULL  -- puedes llenar con detalle si lo pasas desde la aplicación
+    NULL 
   );
 END;
 /
 
 -- reportes--
---  Productos más solicitados
-
+--  Productos mas solicitados
+-- se crea en oper tablas
 CREATE OR REPLACE VIEW reporte_productos_mas_solicitados_vw AS
 SELECT 
   p.id_producto,
@@ -1144,7 +1317,7 @@ GROUP BY p.id_producto, p.nombre_producto
 ORDER BY total_solicitado DESC;
 
 -- Consumo por departamento
-
+-- se crea en oper tablas
 CREATE OR REPLACE VIEW reporte_consumo_departamento_vw AS
 SELECT 
   dep.id_departamento,
@@ -1158,8 +1331,8 @@ JOIN alm_tablas.departamentos_tb dep ON s.id_departamento = dep.id_departamento
 GROUP BY dep.id_departamento, dep.nombre_departamento
 ORDER BY total_entregado DESC;
 
--- Histórico completo por producto 
-
+-- Historico completo por producto 
+-- se crea en oper tablas
 CREATE OR REPLACE VIEW reporte_kardex_producto_vw AS
 SELECT 
   km.id_movimiento,
@@ -1175,8 +1348,8 @@ SELECT
 FROM inv_tablas.kardex_movimientos_tb km
 ORDER BY km.fecha_movimiento DESC;
 
--- Job programado para generación automática
-
+-- Job programado para generacion automatica
+-- se crea en oper tablas
 BEGIN
   DBMS_SCHEDULER.CREATE_JOB (
     job_name        => 'JOB_REPORTE_INVENTARIO_DIARIO',
@@ -1205,15 +1378,13 @@ BEGIN
 END;
 /
 
--- Consultas de verificación rápidas
+-- Consultas de verificacion rapidas
+-- se corre en oper tablas
 -- Alertas pendientes:
 SELECT * FROM oper_tablas.alerta_inventario_tb WHERE procesado = 0 ORDER BY fecha_alerta DESC;
-
 -- Top productos solicitados:
 SELECT * FROM reporte_productos_mas_solicitados_vw WHERE ROWNUM <= 10;
-
 -- Consumo por departamento:
 SELECT * FROM reporte_consumo_departamento_vw;
-
 -- Kárdex de un producto:
 SELECT * FROM reporte_kardex_producto_vw WHERE id_producto = 100;

@@ -475,6 +475,7 @@ GRANT SELECT ON inv_tablas.SEQ_INVENTARIO TO G5Desa01;
 
 ----------------------------------------------------------------------------------------------
 -- PROCEDIMIENTO PARA AGREGAR PRODUCTO A UN ALMACEN
+-- PROCEDIMIENTO PARA AGREGAR PRODUCTO A UN ALMACEN
 ----------------------------------------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE G5_AGREGAR_PRODUCTO_ALMACEN (
     p_id_producto IN NUMBER,
@@ -713,17 +714,6 @@ BEGIN
 END;
 /
 ----------------------------------------------------------------------------------------------
-
-
-/* ============================================================================================
-   AQUI TERMINAN LOS PROCEDIMIENTOS USADOS EN FRONT END 
-============================================================================================ */
-
-
-
-
-
-
 
 
 /* ============================================================================================
@@ -1348,7 +1338,7 @@ BEGIN
     :NEW.cantidad_disponible - :OLD.cantidad_disponible,
     v_tipo,
     SYS_CONTEXT('USERENV','SESSION_USER'),
-    NULL  -- puedes llenar con detalle si lo pasas desde la aplicación
+    NULL 
   );
 END;
 /
@@ -1386,8 +1376,8 @@ JOIN alm_tablas.departamentos_tb dep ON s.id_departamento = dep.id_departamento
 GROUP BY dep.id_departamento, dep.nombre_departamento
 ORDER BY total_entregado DESC;
 
--- Histórico completo por producto 
-
+-- Historico completo por producto 
+-- se crea en oper tablas
 CREATE OR REPLACE VIEW reporte_kardex_producto_vw AS
 SELECT 
   km.id_movimiento,
